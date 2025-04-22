@@ -10,6 +10,23 @@ jobs:
   test-image:
     runs-on: ubuntu-latest
 
+    strategy:
+      fail-fast: false
+      matrix:
+        scenario:
+          - name: basic
+            command: rails new /app
+          - name: postgres
+            command: rails new /app --database=postgresql
+          - name: mysql
+            command: rails new /app --database=mysql
+          - name: trilogy
+            command: rails new /app --database=trilogy
+          - name: mariadb-mysql
+            command: rails new /app --database=mariadb-mysql
+          - name: mariadb-trilogy
+            command: rails new /app --database=mariadb-trilogy
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -24,6 +41,15 @@ jobs:
       - name: Test rails new command in container
         run: |
           docker run --rm rails-test-image:${{ github.sha }} bash -c "\
-            rails new /tmp/testapp && \
-            cd /tmp/testapp && \
+            rails new /testapp && \
+            cd /testapp && \
             bin/rails --version"
+
+      - name: Run rails new - ${{ matrix.scenario.name }}
+        run: |
+          docker run --rm rails-test-image:${{ github.sha }} bash -c "
+            set -e
+            echo 'Testing: ${{ matrix.scenario.command }}'
+            ${{ matrix.scenario.command }} && cd /app && bin/rails --version
+            echo '✅ Success: ${{ matrix.scenario.command }}'
+          "
