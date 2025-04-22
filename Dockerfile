@@ -15,6 +15,8 @@ RUN apk add --update --no-cache \
       # for rails javascript
       yarn \
       nodejs \
+      # database support
+      postgresql-dev mysql-dev && \
       # Clean up temp files
       rm -rf /tmp/*
 
