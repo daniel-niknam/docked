@@ -18,6 +18,8 @@ RUN apk add --update --no-cache \
       nodejs \
       # database support
       postgresql-dev mysql-dev && \
+      # bun
+      npm install -g bun && \
       # Clean up temp files
       rm -rf /tmp/*
 
@@ -33,7 +35,7 @@ ENV PATH="/bundle/ruby/$RUBY_VERSION/bin:${PATH}"
 # Install Rails
 # The bundle config is for fixing the issue for sqlite
 # more info: https://github.com/sparklemotion/sqlite3-ruby/issues/434#issuecomment-1856244508
-RUN bundle config force_ruby_platform true && \
+RUN gem install bundler && \
     gem install rails --no-document
 
 # Make the dev server listen on all interfaces
