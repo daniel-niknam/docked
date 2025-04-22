@@ -14,6 +14,7 @@ RUN apk add --update --no-cache \
       tzdata \
       # for rails javascript
       yarn \
+      npm \
       nodejs \
       # database support
       postgresql-dev mysql-dev && \
