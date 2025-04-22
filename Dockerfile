@@ -9,7 +9,6 @@ RUN apk add --update --no-cache \
       build-base \
       git \
       vips \
-      sqlite-libs \
       tzdata \
       yarn \
       nodejs && \
@@ -26,7 +25,8 @@ ENV BUNDLE_PATH='/bundle'
 ENV PATH="/bundle/ruby/$RUBY_VERSION/bin:${PATH}"
 
 # Install Rails
-RUN gem install rails
+RUN bundle config force_ruby_platform true && \
+    gem install rails --no-document
 
 # Make the dev server listen on all interfaces
 ENV BINDING="0.0.0.0"
