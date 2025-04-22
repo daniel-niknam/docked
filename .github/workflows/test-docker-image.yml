@@ -23,8 +23,7 @@ jobs:
 
       - name: Test rails new command in container
         run: |
-          docker run --rm rails-test-image:${{ github.sha }} bash -c "rails new /tmp/testapp --skip-bundle"
-
-      - name: Verify app directory was created
-        run: |
-          docker run --rm rails-test-image:${{ github.sha }} bash -c "[-d /tmp/testapp] && echo 'Rails new succeeded' || (echo 'Rails new failed' && exit 1)"
+          docker run --rm rails-test-image:${{ github.sha }} bash -c "\
+            rails new /tmp/testapp && \
+            cd /tmp/testapp && \
+            bin/rails --version"
