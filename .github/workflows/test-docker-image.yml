@@ -1,0 +1,30 @@
+name: Test Docked Image build
+
+on:
+  push:
+    branches:
+      - "**"
+  pull_request:
+
+jobs:
+  test-image:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docked image
+        run: |
+          docker build -t rails-test-image:${{ github.sha }} .
+
+      - name: Test rails new command in container
+        run: |
+          docker run --rm rails-test-image:${{ github.sha }} bash -c "rails new /tmp/testapp --skip-bundle"
+
+      - name: Verify app directory was created
+        run: |
+          docker run --rm rails-test-image:${{ github.sha }} bash -c "[-d /tmp/testapp] && echo 'Rails new succeeded' || (echo 'Rails new failed' && exit 1)"
