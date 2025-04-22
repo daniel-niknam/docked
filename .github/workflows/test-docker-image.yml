@@ -71,6 +71,6 @@ jobs:
           docker run --rm rails-test-image-${{ github.sha }} sh -c "
             set -e
             echo 'Running: ${{ matrix.scenario.command }}'
-            ${{ matrix.scenario.command }} && cd /app && bin/rails --version
+            ${{ matrix.scenario.command }} && cd /app && bin/rails test
             echo '✅ Success: ${{ matrix.scenario.command }}'
           "
