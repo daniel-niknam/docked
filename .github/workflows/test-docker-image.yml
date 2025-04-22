@@ -42,17 +42,33 @@ jobs:
         scenario:
           - name: basic
             command: rails new /app
-          - name: esbuild
+          - name: js[bun]
+            command: rails new /app --javascript=bun
+          - name: js[webpack]
+            command: rails new /app --javascript=webpack
+          - name: js[esbuild]
             command: rails new /app --javascript=esbuild
-          - name: postgres
+          - name: js[rollup]
+            command: rails new /app --javascript=rollup
+          - name: css[tailwind]
+            command: rails new /app --css=tailwind
+          - name: css[bootstrap]
+            command: rails new /app --css=bootstrap
+          - name: css[bulma]
+            command: rails new /app --css=bulma
+          - name: css[postcss]
+            command: rails new /app --css=postcss
+          - name: css[sass]
+            command: rails new /app --css=sass
+          - name: db[postgres]
             command: rails new /app --database=postgresql
-          - name: mysql
+          - name: db[mysql]
             command: rails new /app --database=mysql
-          - name: trilogy
+          - name: db[trilogy]
             command: rails new /app --database=trilogy
-          - name: mariadb-mysql
+          - name: db[mariadb-mysql]
             command: rails new /app --database=mariadb-mysql
-          - name: mariadb-trilogy
+          - name: db[mariadb-trilogy]
             command: rails new /app --database=mariadb-trilogy
 
     steps:
