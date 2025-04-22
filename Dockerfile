@@ -1,6 +1,6 @@
 ARG RUBY_VERSION=3.3.0
 
-FROM ruby:$RUBY_VERSION-alpine
+FROM ruby:$RUBY_VERSION-alpine AS build
 
 ARG NODE_MAJOR=20
 
@@ -29,14 +29,27 @@ VOLUME /bundle
 ENV BUNDLE_PATH='/bundle'
 ENV PATH="/bundle/ruby/$RUBY_VERSION/bin:${PATH}"
 
-# Install Rails
-# The bundle config is for fixing the issue for sqlite
-# more info: https://github.com/sparklemotion/sqlite3-ruby/issues/434#issuecomment-1856244508
-RUN bundle config force_ruby_platform true && \
-    gem install rails --no-document
-
 # Make the dev server listen on all interfaces
 ENV BINDING="0.0.0.0"
 
 # No entrypoint override (makes it open/interactive)
 ENTRYPOINT [""]
+
+FROM build AS test
+
+# Install Rails
+# The bundle config is for fixing the issue for sqlite
+# more info: https://github.com/sparklemotion/sqlite3-ruby/issues/434#issuecomment-1856244508
+RUN bundle config force_ruby_platform true && \
+    gem install rails --no-document && \
+    rails new dummy && \
+    rm -rf dummy
+
+
+FROM build AS cli
+
+# Install Rails
+# The bundle config is for fixing the issue for sqlite
+# more info: https://github.com/sparklemotion/sqlite3-ruby/issues/434#issuecomment-1856244508
+RUN bundle config force_ruby_platform true && \
+    gem install rails --no-document

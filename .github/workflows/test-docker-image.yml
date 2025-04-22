@@ -22,7 +22,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t rails-test-image-${{ github.sha }} .
+          docker build -t rails-test-image-${{ github.sha }} . --target test
           docker save rails-test-image-${{ github.sha }} -o image.tar
 
       - name: Upload Docker image artifact
@@ -40,8 +40,6 @@ jobs:
       fail-fast: false
       matrix:
         scenario:
-          - name: basic
-            command: rails new /app
           - name: esbuild
             command: rails new /app --javascript=esbuild
           - name: postgres
