@@ -7,8 +7,34 @@ on:
   pull_request:
 
 jobs:
-  test-image:
+  build-image:
+    name: Build Docker Image
     runs-on: ubuntu-latest
+    outputs:
+      image-name: rails-test-image-${{ github.sha }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        run: |
+          docker build -t rails-test-image-${{ github.sha }} .
+          docker save rails-test-image-${{ github.sha }} -o image.tar
+
+      - name: Upload Docker image artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rails-test-image
+          path: image.tar
+
+  test-image:
+    name: Rails New - ${{ matrix.scenario.name }}
+    runs-on: ubuntu-latest
+    needs: build-image
 
     strategy:
       fail-fast: false
@@ -28,28 +54,21 @@ jobs:
             command: rails new /app --database=mariadb-trilogy
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - name: Download built Docker image
+        uses: actions/download-artifact@v4
+        with:
+          name: rails-test-image
+          path: .
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Build Docked image
+      - name: Load Docker image
         run: |
-          docker build -t rails-test-image:${{ github.sha }} .
-
-      - name: Test rails new command in container
-        run: |
-          docker run --rm rails-test-image:${{ github.sha }} bash -c "\
-            rails new /testapp && \
-            cd /testapp && \
-            bin/rails --version"
+          docker load -i image.tar
 
       - name: Run rails new - ${{ matrix.scenario.name }}
         run: |
-          docker run --rm rails-test-image:${{ github.sha }} bash -c "
+          docker run --rm rails-test-image-${{ github.sha }} bash -c "
             set -e
-            echo 'Testing: ${{ matrix.scenario.command }}'
+            echo 'Running: ${{ matrix.scenario.command }}'
             ${{ matrix.scenario.command }} && cd /app && bin/rails --version
             echo '✅ Success: ${{ matrix.scenario.command }}'
           "
