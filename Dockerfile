@@ -6,14 +6,17 @@ ARG NODE_MAJOR=20
 
 # Install dependencies (build tools, Node, Yarn, libvips)
 RUN apk add --update --no-cache \
-      build-base \
-      git \
+      # essentials
+      build-base git \
+      # image processing
       vips \
+      # for rails timezone
       tzdata \
+      # for rails javascript
       yarn \
-      nodejs && \
-    # Clean up temp files
-    rm -rf /tmp/*
+      nodejs \
+      # Clean up temp files
+      rm -rf /tmp/*
 
 # Set working directory
 WORKDIR /rails
@@ -25,6 +28,8 @@ ENV BUNDLE_PATH='/bundle'
 ENV PATH="/bundle/ruby/$RUBY_VERSION/bin:${PATH}"
 
 # Install Rails
+# The bundle config is for fixing the issue for sqlite
+# more info: https://github.com/sparklemotion/sqlite3-ruby/issues/434#issuecomment-1856244508
 RUN bundle config force_ruby_platform true && \
     gem install rails --no-document
 
